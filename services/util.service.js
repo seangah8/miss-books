@@ -9,6 +9,7 @@ export const utilService = {
     animateCSS
 }
 
+// return random id
 function makeId(length = 6) {
     var txt = ''
     var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -20,6 +21,7 @@ function makeId(length = 6) {
     return txt
 }
 
+// return 100 sentence with 100 words randomly placed
 function makeLorem(size = 100) {
     const words = ['The sky', 'above', 'the port', 'was', 'the color' ,'of nature', 'tuned', 'to', 'a live channel', 'All', 'this happened', 'more or less', 'I', 'had', 'the story', 'bit by bit', 'from various people', 'and', 'as generally', 'happens', 'in such cases', 'each time', 'it', 'was', 'a different story', 'a pleasure', 'to', 'burn']
     var txt = ''
@@ -31,6 +33,7 @@ function makeLorem(size = 100) {
     return txt
 }
 
+//retrun random number btween the min-max, return initial only
 function getRandomIntInclusive(min, max) {
     min = Math.ceil(min)
     max = Math.floor(max)
