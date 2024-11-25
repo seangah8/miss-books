@@ -6,7 +6,8 @@ export const utilService = {
     getRandomIntInclusive,
     getDayName,
     getMonthName,
-    animateCSS
+    animateCSS,
+    debounce,
 }
 
 // return random id
@@ -74,4 +75,14 @@ function animateCSS(el, animation='bounce') {
 
         el.addEventListener('animationend', handleAnimationEnd, { once: true })
     })
+}
+
+function debounce(func, time = 500){
+    var timeoutId
+    return (...args)=>{
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(()=>{
+            func(...args)
+        },time)
+    }
 }

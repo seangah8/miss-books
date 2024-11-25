@@ -4,13 +4,13 @@ import { storageService } from './storage.service.js'
 const BOOK_KEY = 'bookDB'
 _createDefultBooks()
 
-export const bookservice = {
+export const bookService = {
     query,
     get,
     remove,
     save,
-    getEmptyBook,
     getDefaultFilter,
+    getTopBookPrice,
 }
 
 // For Debug (easy access from console):
@@ -18,19 +18,20 @@ export const bookservice = {
 
 
 // returns the filterd book list
-function query(filterBy = {}) {
-    console.log('in query')
+function query(filter = {}) {
     return storageService.query(BOOK_KEY)
         .then(books => {
-            // if (filterBy.txt) {
-            //     const regExp = new RegExp(filterBy.txt, 'i')
-            //     books = books.filter(book => regExp.test(book.vendor))
-            // }
-
-            // if (filterBy.minSpeed) {
-            //     books = books.filter(book => book.maxSpeed >= filterBy.minSpeed)
-            // }
-
+            if (filter.title) {
+                const regExp = new RegExp(filter.title, 'i')
+                books = books.filter(book => regExp.test(book.title))
+            }
+            if(filter.maxAmount || filter.maxAmount===0){
+                books = books.filter(book => filter.maxAmount >= book.listPrice.amount)
+            }
+            if(filter.onSale)
+            {
+                books = books.filter(book => book.listPrice.isOnSale)
+            }
             return books
         })
 }
@@ -55,17 +56,27 @@ function save(book) {
 }
 
 // returns defualt filter settings
-function getDefaultFilter(filterBy = {title: '', listPrice: {amout:0, currencyCode:'', isOnSale:false}}) {
-    return { title: filterBy.title, listPrice: filterBy.listPrice }
+function getDefaultFilter() {
+    return { title: '', maxAmount: Number.MAX_SAFE_INTEGER, onSale: false}
+}
+
+// returns the price of the most expensive book on the list
+async function getTopBookPrice(){
+    const books = await storageService.query(BOOK_KEY)
+    const maxPrice = books.reduce((accumulator, book)=>{
+        const bookPrice = book.listPrice.amount
+        return (bookPrice > accumulator) ? bookPrice : accumulator
+    },0)
+    return maxPrice
 }
 
 // if no DB, creates you new one with 3 defult books
 function _createDefultBooks() {
     let books = utilService.loadFromStorage(BOOK_KEY)
     if (!books || !books.length) {
-        books = [_createBook('Gwent', {amout:5, currencyCode:'EUR', isOnSale:false}),
-                    _createBook('Unbored', {amout:10, currencyCode:'USD', isOnSale:false}),
-                    _createBook('Holes', {amout:15, currencyCode:'ILS', isOnSale:false})
+        books = [_createBook('Gwent', {amount:50, currencyCode:'EUR', isOnSale:false}),
+                    _createBook('Unbored', {amount:75, currencyCode:'USD', isOnSale:true}),
+                    _createBook('Holes', {amount:125, currencyCode:'ILS', isOnSale:true})
         ]
         utilService.saveToStorage(BOOK_KEY, books)
     }
